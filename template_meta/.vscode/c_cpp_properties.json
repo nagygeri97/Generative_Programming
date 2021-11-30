@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "D:/ProgramFiles/MinGW/bin/g++.exe",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "windows-gcc-x86",
+            "compilerArgs": [
+                "-I \"D:\\Program Files\\boost_1_77_0\""
+            ]
+        }
+    ],
+    "version": 4
+}
