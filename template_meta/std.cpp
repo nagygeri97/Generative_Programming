@@ -60,6 +60,27 @@ struct IntList<Head> {
     list;
 };
 
+// Maximum of two elements (wrapped Integers)
+template <typename A, typename B>
+struct Max {
+    typedef std::conditional_t<
+        (static_cast<int>(A::value) > static_cast<int>(B::value)),
+        A,
+        B>
+    value;
+};
+
+// Last element of a non-empty list
+template <typename List>
+struct Last {
+    typedef typename Last<typename List::tail>::value value;
+};
+
+template <typename T>
+struct Last<LinkedList<T, Null>> {
+    typedef T value;
+};
+
 // Generate empty row of DP table
 template <typename List>
 struct GenerateEmptyRow {
@@ -78,30 +99,27 @@ struct GenerateEmptyRow<Null> {
 };
 
 // Filling out a row of the DP
-template <typename Head, typename List1, typename PrevRow, bool IsEnabled = std::is_same<Head, typename List1::head>::value>
+template <typename Head, typename List1, typename PrevRow, typename PrevElem>
 struct FillRow {
-    typedef LinkedList<
+    typedef std::conditional_t<
+        std::is_same<Head, typename List1::head>::value,
         Integer<PrevRow::head::value + 1>,
-        typename FillRow<
-            Head,
-            typename List1::tail,
-            typename PrevRow::tail>::value>
-    value;
-};
+        typename Max<
+            typename PrevRow::tail::head,
+            PrevElem>::value> currentElem;
 
-template <typename Head, typename List1, typename PrevRow>
-struct FillRow<Head, List1, PrevRow, false> {
     typedef LinkedList<
-        typename PrevRow::tail::head,
+        currentElem,
         typename FillRow<
             Head,
             typename List1::tail,
-            typename PrevRow::tail>::value>
+            typename PrevRow::tail,
+            currentElem>::value>
     value;
 };
 
-template <typename Head, typename PrevRow, bool IsEnabled>
-struct FillRow<Head, Null, PrevRow, IsEnabled> {
+template <typename Head, typename PrevRow, typename PrevElem>
+struct FillRow<Head, Null, PrevRow, PrevElem> {
     typedef Null value;
 };
 
@@ -115,17 +133,21 @@ struct LongestCommonSubsequence {
         List1,
         typename List2::tail,
         LinkedList<
-            typename FillRow<
-                typename List2::head,
-                List1,
-                typename Table::head>::value,
+            ListWrapper<
+                LinkedList<
+                    Integer<0>,
+                    typename FillRow<
+                        typename List2::head,
+                        List1,
+                        typename Table::head::value,
+                        Integer<0>>::value>>,
             Table>>::value
         };
 };
 
 template <typename List1, typename Table>
 struct LongestCommonSubsequence<List1, Null, Table> {
-    enum {value = Last<typename Table::head::value>::value};
+    enum {value = Last<typename Table::head::value>::value::value};
 };
 
 template <typename List1, typename List2>
@@ -134,15 +156,28 @@ struct LongestCommonSubsequence<List1, List2, void> {
         List1,
         List2,
         LinkedList<
-            typename GenerateEmptyRow<List1>::value,
+            ListWrapper<typename GenerateEmptyRow<List1>::value>,
             Null>>::value
         };
 };
 
 int main() {
+    // Testing lists
     static_assert(LinkedList<Integer<1>,LinkedList<Integer<2>,LinkedList<Integer<3>,Null>>>::head::value == 1, "");
     static_assert(List<Integer<1>,Integer<2>,Integer<3>>::list::head::value == 1, "");
     static_assert(IntList<1,2,3>::list::head::value == 1, "");
     static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::head::value::head::value == 4, "");
     static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::tail::head::value::head::value == 7, "");
+
+    // Testing longest common subsequence
+    static_assert(LongestCommonSubsequence<
+        typename IntList<1,3,1,4,2>::list,
+        typename IntList<3,2,4,1>::list>::value
+        == 2, "");
+    static_assert(LongestCommonSubsequence<
+        typename IntList<3,2,4,1>::list,
+        typename IntList<1,3,1,4,2>::list>::value
+        == 2, "");
+
+    // TODO: add traceback
 }
