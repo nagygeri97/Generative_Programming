@@ -1,4 +1,3 @@
-#include <iostream>
 #include <type_traits>
 
 // Wrapper classes for use in LinkedList
