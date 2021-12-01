@@ -81,6 +81,28 @@ struct Last<LinkedList<T, Null>> {
     typedef T value;
 };
 
+// Reverse a list
+template <typename List, typename Result = Null>
+struct Reverse {
+    typedef typename Reverse<
+        typename List::tail,
+        LinkedList<
+            typename List::head,
+            Result>>::value
+    value;
+};
+
+template <typename Result>
+struct Reverse<Null, Result> {
+    typedef Result value;
+};
+
+// Reverse a wrapped list
+template <typename WrappedList>
+struct ReverseWrapped {
+    typedef ListWrapper<typename Reverse<typename WrappedList::value>::value> value;
+};
+
 // Generate empty row of DP table
 template <typename List>
 struct GenerateEmptyRow {
@@ -123,15 +145,77 @@ struct FillRow<Head, Null, PrevRow, PrevElem> {
     typedef Null value;
 };
 
+// Map all elements of a list
+template <template<typename> typename F, typename List>
+struct Map {
+    typedef LinkedList<
+        typename F<typename List::head>::value,
+        typename Map<F, typename List::tail>::value>
+    value;
+};
+
+template <template<typename> typename F>
+struct Map<F, Null> {
+    typedef Null value;
+};
+
+// Remove the head of a non-empty wrapped list, and wrap it again
+template <typename WrappedList>
+struct RemoveWrappedHead {
+    typedef ListWrapper<typename WrappedList::value::tail> value;
+};
+
+
+// Traceback to generate the longes common subsequence from the DP table
+template <typename List1, typename List2, typename Table, typename Result = Null>
+struct Traceback {
+    typedef typename std::conditional_t<
+        std::is_same_v<typename List1::head, typename List2::head>,
+        Traceback<
+            typename List1::tail,
+            typename List2::tail, 
+            typename Map<RemoveWrappedHead, typename Table::tail>::value,
+            LinkedList<typename List1::head, Result>>,
+        std::conditional_t<
+            (static_cast<int>(Table::head::value::tail::head::value) > static_cast<int>(Table::tail::head::value::head::value)),
+            Traceback<
+                typename List1::tail,
+                List2,
+                typename Map<RemoveWrappedHead, Table>::value,
+                Result>,
+            Traceback<
+                List1,
+                typename List2::tail,
+                typename Table::tail,
+                Result>>>::value value;
+};
+
+template <typename List2, typename Table, typename Result>
+struct Traceback<Null, List2, Table, Result> {
+    typedef Result value;
+};
+
+template <typename List1, typename Table, typename Result>
+struct Traceback<List1, Null, Table, Result> {
+    typedef Result value;
+};
+
+template <typename Table, typename Result>
+struct Traceback<Null, Null, Table, Result> {
+    typedef Result value;
+};
+
+
 // Longest common subsequence
 
 // Expects two LinkedLists containing integers.
 // Table containst the rows of the DP table in reverse order, i.e. last row is first in the list
-template <typename List1, typename List2, typename Table = void>
+template <typename List1, typename List2, typename OriginalList2 = List2, typename Table = LinkedList<ListWrapper<typename GenerateEmptyRow<List1>::value>, Null>>
 struct LongestCommonSubsequence {
-    enum {value = LongestCommonSubsequence<
+    typedef LongestCommonSubsequence<
         List1,
         typename List2::tail,
+        OriginalList2,
         LinkedList<
             ListWrapper<
                 LinkedList<
@@ -141,43 +225,105 @@ struct LongestCommonSubsequence {
                         List1,
                         typename Table::head::value,
                         Integer<0>>::value>>,
-            Table>>::value
-        };
+            Table>>
+    lcs;
+
+    enum {length = lcs::length };
+    typedef typename lcs::sequence sequence;
 };
 
-template <typename List1, typename Table>
-struct LongestCommonSubsequence<List1, Null, Table> {
-    enum {value = Last<typename Table::head::value>::value::value};
-};
+template <typename List1, typename OriginalList2, typename Table>
+struct LongestCommonSubsequence<List1, Null, OriginalList2, Table> {
+    enum {length = Last<typename Table::head::value>::value::value};
 
-template <typename List1, typename List2>
-struct LongestCommonSubsequence<List1, List2, void> {
-    enum {value = LongestCommonSubsequence<
-        List1,
-        List2,
-        LinkedList<
-            ListWrapper<typename GenerateEmptyRow<List1>::value>,
-            Null>>::value
-        };
+    typedef typename Traceback<
+        typename Reverse<List1>::value,
+        typename Reverse<OriginalList2>::value, 
+        typename Map<ReverseWrapped, Table>::value>::value
+    sequence;
 };
 
 int main() {
-    // Testing lists
+    // Lists
     static_assert(LinkedList<Integer<1>,LinkedList<Integer<2>,LinkedList<Integer<3>,Null>>>::head::value == 1, "");
     static_assert(List<Integer<1>,Integer<2>,Integer<3>>::list::head::value == 1, "");
     static_assert(IntList<1,2,3>::list::head::value == 1, "");
     static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::head::value::head::value == 4, "");
     static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::tail::head::value::head::value == 7, "");
 
-    // Testing longest common subsequence
+    // Reverse
+    static_assert(std::is_same_v<
+        typename IntList<3,2,1>::list, 
+        typename Reverse<typename IntList<1,2,3>::list>::value>, 
+        "");
+
+    // RemoveWrappedHead
+    static_assert(std::is_same_v<
+        ListWrapper<typename IntList<2,3>::list>,
+        typename RemoveWrappedHead<ListWrapper<typename IntList<1,2,3>::list>>::value>,
+        "");
+
+    // Map
+    static_assert(std::is_same_v<
+        typename List<ListWrapper<IntList<5,6>::list>, ListWrapper<IntList<8,9>::list>>::list,
+        typename Map<RemoveWrappedHead, List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list>::value>,
+        "");
+
+    // LongestCommonSubsequence::length
     static_assert(LongestCommonSubsequence<
         typename IntList<1,3,1,4,2>::list,
-        typename IntList<3,2,4,1>::list>::value
+        typename IntList<3,2,4,1>::list>::length
         == 2, "");
     static_assert(LongestCommonSubsequence<
         typename IntList<3,2,4,1>::list,
-        typename IntList<1,3,1,4,2>::list>::value
+        typename IntList<1,3,1,4,2>::list>::length
         == 2, "");
 
-    // TODO: add traceback
+    static_assert(LongestCommonSubsequence<
+        typename IntList<15,12,4,20,1,17,24>::list,
+        typename IntList<12,24,4,1,18,15,17>::list>::length
+        == 4, "");
+    static_assert(LongestCommonSubsequence<
+        typename IntList<12,24,4,1,18,15,17>::list,
+        typename IntList<15,12,4,20,1,17,24>::list>::length
+        == 4, "");
+
+    static_assert(LongestCommonSubsequence<
+        typename IntList<42,42,42>::list,
+        typename IntList<42,42,42>::list>::length
+        == 3, "");
+
+    // LongestCommonSubsequence::sequence
+    static_assert(std::is_same_v<
+        typename IntList<3,2>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<1,3,1,4,2>::list,
+            typename IntList<3,2,4,1>::list>::sequence>,
+        "");
+    static_assert(std::is_same_v<
+        typename IntList<3,1>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<3,2,4,1>::list,
+            typename IntList<1,3,1,4,2>::list>::sequence>,
+        "");
+
+    static_assert(std::is_same_v<
+        typename IntList<12,4,1,17>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<15,12,4,20,1,17,24>::list,
+            typename IntList<12,24,4,1,18,15,17>::list>::sequence>,
+        "");
+    static_assert(std::is_same_v<
+        typename IntList<12,4,1,17>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<12,24,4,1,18,15,17>::list,
+            typename IntList<15,12,4,20,1,17,24>::list>::sequence>,
+        "");
+
+    static_assert(std::is_same_v<
+        typename IntList<42,42,42>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<42,42,42>::list,
+            typename IntList<42,42,42>::list>::sequence>,
+        "");
 }
