@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/core/enable_if.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/vector.hpp>
@@ -11,6 +12,13 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/back.hpp>
 #include <boost/mpl/pop_front.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/at.hpp>
+#include <boost/mpl/next_prior.hpp>
+#include <boost/mpl/comparison.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/mpl/equal.hpp>
+#include <boost/mpl/assert.hpp>
 
 using namespace boost;
 using namespace boost::mpl;
@@ -40,10 +48,51 @@ struct FillRow {
         >::type type;
 };
 
+template <typename Vector1, typename Vector2, typename Table, typename N, typename M, typename Enable = void>
+struct Traceback {
+    typedef typename if_<
+        is_same<typename at<Vector1, typename prior<N>::type>::type, typename at<Vector2, typename prior<M>::type>::type>,
+        typename push_back<
+            typename Traceback<
+                Vector1,
+                Vector2,
+                Table,
+                typename prior<N>::type,
+                typename prior<M>::type
+                >::type, 
+            typename at<Vector1, typename prior<N>::type>::type
+            >::type,
+        typename if_<
+            greater_equal<
+                typename at<typename at<Table, typename prior<M>::type>::type::type, N>::type,
+                typename at<typename at<Table, M>::type::type, typename prior<N>::type>::type
+                >,
+            typename Traceback<
+                Vector1,
+                Vector2,
+                Table,
+                N,
+                typename prior<M>::type
+                >::type,
+            typename Traceback<
+                Vector1,
+                Vector2,
+                Table,
+                typename prior<N>::type,
+                M
+                >::type
+            >::type
+        >::type type;
+};
+
+template <typename Vector1, typename Vector2, typename Table, typename N, typename M>
+struct Traceback<Vector1, Vector2, Table, N, M,
+    typename enable_if<typename or_<bool_<N::value == 0>, bool_<M::value == 0>>::type>::type> {
+    typedef vector0_c<int> type;
+};
 
 template <typename Vector1, typename Vector2>
 struct LongestCommonSubsequence {
-
     typedef typename fold<
         Vector2,
         vector1<EmptyRow<Vector1>>,
@@ -53,6 +102,14 @@ struct LongestCommonSubsequence {
     >::type table;
 
     enum {length = back<typename back<table>::type>::type::value};
+
+    typedef typename Traceback<
+        Vector1,
+        Vector2,
+        table,
+        typename size<Vector1>::type,
+        typename size<Vector2>::type
+    >::type sequence;
 };
 
 int main() {
@@ -60,23 +117,52 @@ int main() {
     static_assert(LongestCommonSubsequence<
         vector_c<int,1,3,1,4,2>,
         vector_c<int,3,2,4,1>>::length
-        == 2, "");
+        == 2);
     static_assert(LongestCommonSubsequence<
         vector_c<int,3,2,4,1>,
         vector_c<int,1,3,1,4,2>>::length
-        == 2, "");
+        == 2);
 
     static_assert(LongestCommonSubsequence<
         vector_c<int,15,12,4,20,1,17,24>,
         vector_c<int,12,24,4,1,18,15,17>>::length
-        == 4, "");
+        == 4);
     static_assert(LongestCommonSubsequence<
         vector_c<int,12,24,4,1,18,15,17>,
         vector_c<int,15,12,4,20,1,17,24>>::length
-        == 4, "");
+        == 4);
 
     static_assert(LongestCommonSubsequence<
         vector_c<int,42,42,42>,
         vector_c<int,42,42,42>>::length
-        == 3, "");
+        == 3);
+
+    // LongestCommonSubsequence::sequence
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,3,2>,
+        typename LongestCommonSubsequence<
+            vector_c<int,1,3,1,4,2>,
+            vector_c<int,3,2,4,1>>::sequence>));
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,3,1>,
+        typename LongestCommonSubsequence<
+            vector_c<int,3,2,4,1>,
+            vector_c<int,1,3,1,4,2>>::sequence>));
+
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,12,4,1,17>,
+        typename LongestCommonSubsequence<
+            vector_c<int,15,12,4,20,1,17,24>,
+            vector_c<int,12,24,4,1,18,15,17>>::sequence>));
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,12,4,1,17>,
+        typename LongestCommonSubsequence<
+            vector_c<int,12,24,4,1,18,15,17>,
+            vector_c<int,15,12,4,20,1,17,24>>::sequence>));
+
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,42,42,42>,
+        typename LongestCommonSubsequence<
+            vector_c<int,42,42,42>,
+            vector_c<int,42,42,42>>::sequence>));
 }

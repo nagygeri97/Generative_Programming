@@ -244,85 +244,77 @@ struct LongestCommonSubsequence<List1, Null, OriginalList2, Table> {
 
 int main() {
     // Lists
-    static_assert(LinkedList<Integer<1>,LinkedList<Integer<2>,LinkedList<Integer<3>,Null>>>::head::value == 1, "");
-    static_assert(List<Integer<1>,Integer<2>,Integer<3>>::list::head::value == 1, "");
-    static_assert(IntList<1,2,3>::list::head::value == 1, "");
-    static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::head::value::head::value == 4, "");
-    static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::tail::head::value::head::value == 7, "");
+    static_assert(LinkedList<Integer<1>,LinkedList<Integer<2>,LinkedList<Integer<3>,Null>>>::head::value == 1);
+    static_assert(List<Integer<1>,Integer<2>,Integer<3>>::list::head::value == 1);
+    static_assert(IntList<1,2,3>::list::head::value == 1);
+    static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::head::value::head::value == 4);
+    static_assert(List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list::tail::head::value::head::value == 7);
 
     // Reverse
     static_assert(std::is_same_v<
         typename IntList<3,2,1>::list, 
-        typename Reverse<typename IntList<1,2,3>::list>::value>, 
-        "");
+        typename Reverse<typename IntList<1,2,3>::list>::value>);
 
     // RemoveWrappedHead
     static_assert(std::is_same_v<
         ListWrapper<typename IntList<2,3>::list>,
-        typename RemoveWrappedHead<ListWrapper<typename IntList<1,2,3>::list>>::value>,
-        "");
+        typename RemoveWrappedHead<ListWrapper<typename IntList<1,2,3>::list>>::value>);
 
     // Map
     static_assert(std::is_same_v<
         typename List<ListWrapper<IntList<5,6>::list>, ListWrapper<IntList<8,9>::list>>::list,
-        typename Map<RemoveWrappedHead, List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list>::value>,
-        "");
+        typename Map<RemoveWrappedHead, List<ListWrapper<IntList<4,5,6>::list>, ListWrapper<IntList<7,8,9>::list>>::list>::value>);
 
     // LongestCommonSubsequence::length
     static_assert(LongestCommonSubsequence<
         typename IntList<1,3,1,4,2>::list,
         typename IntList<3,2,4,1>::list>::length
-        == 2, "");
+        == 2);
     static_assert(LongestCommonSubsequence<
         typename IntList<3,2,4,1>::list,
         typename IntList<1,3,1,4,2>::list>::length
-        == 2, "");
+        == 2);
 
     static_assert(LongestCommonSubsequence<
         typename IntList<15,12,4,20,1,17,24>::list,
         typename IntList<12,24,4,1,18,15,17>::list>::length
-        == 4, "");
+        == 4);
     static_assert(LongestCommonSubsequence<
         typename IntList<12,24,4,1,18,15,17>::list,
         typename IntList<15,12,4,20,1,17,24>::list>::length
-        == 4, "");
+        == 4);
 
     static_assert(LongestCommonSubsequence<
         typename IntList<42,42,42>::list,
         typename IntList<42,42,42>::list>::length
-        == 3, "");
+        == 3);
 
     // LongestCommonSubsequence::sequence
     static_assert(std::is_same_v<
         typename IntList<3,2>::list,
         typename LongestCommonSubsequence<
             typename IntList<1,3,1,4,2>::list,
-            typename IntList<3,2,4,1>::list>::sequence>,
-        "");
+            typename IntList<3,2,4,1>::list>::sequence>);
     static_assert(std::is_same_v<
         typename IntList<3,1>::list,
         typename LongestCommonSubsequence<
             typename IntList<3,2,4,1>::list,
-            typename IntList<1,3,1,4,2>::list>::sequence>,
-        "");
+            typename IntList<1,3,1,4,2>::list>::sequence>);
 
     static_assert(std::is_same_v<
         typename IntList<12,4,1,17>::list,
         typename LongestCommonSubsequence<
             typename IntList<15,12,4,20,1,17,24>::list,
-            typename IntList<12,24,4,1,18,15,17>::list>::sequence>,
-        "");
+            typename IntList<12,24,4,1,18,15,17>::list>::sequence>);
     static_assert(std::is_same_v<
         typename IntList<12,4,1,17>::list,
         typename LongestCommonSubsequence<
             typename IntList<12,24,4,1,18,15,17>::list,
-            typename IntList<15,12,4,20,1,17,24>::list>::sequence>,
-        "");
+            typename IntList<15,12,4,20,1,17,24>::list>::sequence>);
 
     static_assert(std::is_same_v<
         typename IntList<42,42,42>::list,
         typename LongestCommonSubsequence<
             typename IntList<42,42,42>::list,
-            typename IntList<42,42,42>::list>::sequence>,
-        "");
+            typename IntList<42,42,42>::list>::sequence>);
 }
