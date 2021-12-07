@@ -1,24 +1,23 @@
-#include <iostream>
 #include <boost/core/enable_if.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/vector_c.hpp>
-#include <boost/mpl/transform.hpp>
+#include <boost/mpl/assert.hpp>
 #include <boost/mpl/always.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/pair_view.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/at.hpp>
 #include <boost/mpl/back.hpp>
+#include <boost/mpl/comparison.hpp>
+#include <boost/mpl/equal.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/mpl/next_prior.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/mpl/pair_view.hpp>
+#include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/pop_front.hpp>
 #include <boost/mpl/size.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/next_prior.hpp>
-#include <boost/mpl/comparison.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/equal.hpp>
-#include <boost/mpl/assert.hpp>
+#include <boost/mpl/transform.hpp>
+#include <boost/mpl/vector.hpp>
+#include <boost/mpl/vector_c.hpp>
+#include <boost/type_traits.hpp>
 
 using namespace boost;
 using namespace boost::mpl;
