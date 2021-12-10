@@ -1,5 +1,7 @@
+BOOSTPATH = "D:\Program Files\boost_1_77_0"
+
 CXX = g++
-CXXFLAGS = -std=c++17 -I "D:\Program Files\boost_1_77_0"
+CXXFLAGS = -std=c++17 -I $(BOOSTPATH)
 
 std:
 	$(CXX) $(CXXFLAGS) -o std.exe std.cpp
@@ -9,3 +11,5 @@ mpl:
 
 hana:
 	$(CXX) $(CXXFLAGS) -o hana.exe hana.cpp
+
+all: std mpl hana
