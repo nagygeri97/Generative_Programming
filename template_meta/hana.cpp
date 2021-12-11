@@ -85,4 +85,31 @@ int main() {
         tuple_c<int,42,42,42>,
         tuple_c<int,42,42,42>)
         == make_pair(3_c, tuple_c<int,42,42,42>));
+
+    static_assert(longest_common_subsequence(
+        tuple_c<int>,
+        tuple_c<int,1,2,3>)
+        == make_pair(0_c, tuple_c<int>));
+    static_assert(longest_common_subsequence(
+        tuple_c<int,1,2,3>,
+        tuple_c<int>)
+        == make_pair(0_c, tuple_c<int>));
+
+    static_assert(longest_common_subsequence(
+        tuple_c<int,1,2,3,4,5>,
+        tuple_c<int,6,7,8>)
+        == make_pair(0_c, tuple_c<int>));
+    static_assert(longest_common_subsequence(
+        tuple_c<int,1,2,3,4,5>,
+        tuple_c<int,6,7,8>)
+        == make_pair(0_c, tuple_c<int>));
+
+    static_assert(longest_common_subsequence(
+        tuple_c<int,2,1,7,3,5,4,8,9,3,6>,
+        tuple_c<int,1,3,5,2,4,3,6,7,8,9>)
+        == make_pair(6_c, tuple_c<int,1,3,5,4,3,6>));
+    static_assert(longest_common_subsequence(
+        tuple_c<int,1,3,5,2,4,3,6,7,8,9>,
+        tuple_c<int,2,1,7,3,5,4,8,9,3,6>)
+        == make_pair(6_c, tuple_c<int,1,3,5,4,8,9>));
 }

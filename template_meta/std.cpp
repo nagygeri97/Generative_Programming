@@ -25,38 +25,38 @@ struct LinkedList {
 
 // Variadic templates to make writing lists more readable
 
+template <typename... Tail>
+struct List {};
+
 template <typename Head, typename... Tail>
-struct List {
+struct List<Head, Tail...> {
     typedef LinkedList<
         Head,
         typename List<Tail...>::list>
     list;
 };
 
-template <typename Head>
-struct List<Head> {
-    typedef LinkedList<
-        Head,
-        Null>
-    list;
+template <>
+struct List<> {
+    typedef Null list;
 };
 
 // List of Integers
 
+template <int... Tail>
+struct IntList {};
+
 template <int Head, int... Tail>
-struct IntList {
+struct IntList<Head, Tail...> {
     typedef LinkedList<
         Integer<Head>,
         typename IntList<Tail...>::list>
     list;
 };
 
-template <int Head>
-struct IntList<Head> {
-    typedef LinkedList<
-        Integer<Head>,
-        Null>
-    list;
+template <>
+struct IntList<> {
+    typedef Null list;
 };
 
 // Maximum of two elements (wrapped Integers)
@@ -289,6 +289,33 @@ int main() {
         typename IntList<42,42,42>::list>::length
         == 3);
 
+    static_assert(LongestCommonSubsequence<
+        typename IntList<>::list,
+        typename IntList<1,2,3>::list>::length
+        == 0);
+    static_assert(LongestCommonSubsequence<
+        typename IntList<1,2,3>::list,
+        typename IntList<>::list>::length
+        == 0);
+
+    static_assert(LongestCommonSubsequence<
+        typename IntList<1,2,3,4,5>::list,
+        typename IntList<6,7,8>::list>::length
+        == 0);
+    static_assert(LongestCommonSubsequence<
+        typename IntList<6,7,8>::list,
+        typename IntList<1,2,3,4,5>::list>::length
+        == 0);
+
+    static_assert(LongestCommonSubsequence<
+        typename IntList<2,1,7,3,5,4,8,9,3,6>::list,
+        typename IntList<1,3,5,2,4,3,6,7,8,9>::list>::length
+        == 6);
+    static_assert(LongestCommonSubsequence<
+        typename IntList<2,1,7,3,5,4,8,9,3,6>::list,
+        typename IntList<1,3,5,2,4,3,6,7,8,9>::list>::length
+        == 6);
+
     // LongestCommonSubsequence::sequence
     static_assert(std::is_same_v<
         typename IntList<3,2>::list,
@@ -317,4 +344,37 @@ int main() {
         typename LongestCommonSubsequence<
             typename IntList<42,42,42>::list,
             typename IntList<42,42,42>::list>::sequence>);
+
+    static_assert(std::is_same_v<
+        typename IntList<>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<>::list,
+            typename IntList<1,2,3>::list>::sequence>);
+    static_assert(std::is_same_v<
+        typename IntList<>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<1,2,3>::list,
+            typename IntList<>::list>::sequence>);
+
+    static_assert(std::is_same_v<
+        typename IntList<>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<1,2,3,4,5>::list,
+            typename IntList<6,7,8>::list>::sequence>);
+    static_assert(std::is_same_v<
+        typename IntList<>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<6,7,8>::list,
+            typename IntList<1,2,3,4,5>::list>::sequence>);
+
+    static_assert(std::is_same_v<
+        typename IntList<1,3,5,4,3,6>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<2,1,7,3,5,4,8,9,3,6>::list,
+            typename IntList<1,3,5,2,4,3,6,7,8,9>::list>::sequence>);
+    static_assert(std::is_same_v<
+        typename IntList<1,3,5,4,8,9>::list,
+        typename LongestCommonSubsequence<
+            typename IntList<1,3,5,2,4,3,6,7,8,9>::list,
+            typename IntList<2,1,7,3,5,4,8,9,3,6>::list>::sequence>);
 }

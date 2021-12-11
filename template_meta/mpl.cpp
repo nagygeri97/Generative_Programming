@@ -100,7 +100,7 @@ struct LongestCommonSubsequence {
         >
     >::type table;
 
-    enum {length = back<typename back<table>::type>::type::value};
+    enum {length = back<typename back<table>::type::type>::type::value};
 
     typedef typename Traceback<
         Vector1,
@@ -136,6 +136,33 @@ int main() {
         vector_c<int,42,42,42>>::length
         == 3);
 
+    static_assert(LongestCommonSubsequence<
+        vector_c<int>,
+        vector_c<int,1,2,3>>::length
+        == 0);
+    static_assert(LongestCommonSubsequence<
+        vector_c<int,1,2,3>,
+        vector_c<int>>::length
+        == 0);
+
+    static_assert(LongestCommonSubsequence<
+        vector_c<int,1,2,3,4,5>,
+        vector_c<int,6,7,8>>::length
+        == 0);
+    static_assert(LongestCommonSubsequence<
+        vector_c<int,1,2,3,4,5>,
+        vector_c<int,6,7,8>>::length
+        == 0);
+
+    static_assert(LongestCommonSubsequence<
+        vector_c<int,2,1,7,3,5,4,8,9,3,6>,
+        vector_c<int,1,3,5,2,4,3,6,7,8,9>>::length
+        == 6);
+    static_assert(LongestCommonSubsequence<
+        vector_c<int,1,3,5,2,4,3,6,7,8,9>,
+        vector_c<int,2,1,7,3,5,4,8,9,3,6>>::length
+        == 6);
+
     // LongestCommonSubsequence::sequence
     BOOST_MPL_ASSERT((equal<
         vector_c<int,3,2>,
@@ -164,4 +191,37 @@ int main() {
         typename LongestCommonSubsequence<
             vector_c<int,42,42,42>,
             vector_c<int,42,42,42>>::sequence>));
+    
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int>,
+        typename LongestCommonSubsequence<
+            vector_c<int>,
+            vector_c<int,1,2,3>>::sequence>));
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int>,
+        typename LongestCommonSubsequence<
+            vector_c<int,1,2,3>,
+            vector_c<int>>::sequence>));
+
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int>,
+        typename LongestCommonSubsequence<
+            vector_c<int,1,2,3,4,5>,
+            vector_c<int,6,7,8>>::sequence>));
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int>,
+        typename LongestCommonSubsequence<
+            vector_c<int,1,2,3,4,5>,
+            vector_c<int,6,7,8>>::sequence>));
+
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,1,3,5,4,3,6>,
+        typename LongestCommonSubsequence<
+            vector_c<int,2,1,7,3,5,4,8,9,3,6>,
+            vector_c<int,1,3,5,2,4,3,6,7,8,9>>::sequence>));
+    BOOST_MPL_ASSERT((equal<
+        vector_c<int,1,3,5,4,8,9>,
+        typename LongestCommonSubsequence<
+            vector_c<int,1,3,5,2,4,3,6,7,8,9>,
+            vector_c<int,2,1,7,3,5,4,8,9,3,6>>::sequence>));
 }
