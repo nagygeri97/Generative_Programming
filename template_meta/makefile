@@ -13,3 +13,6 @@ hana:
 	$(CXX) $(CXXFLAGS) -o hana.exe hana.cpp
 
 all: std mpl hana
+
+clean:
+	del /Q *.exe
