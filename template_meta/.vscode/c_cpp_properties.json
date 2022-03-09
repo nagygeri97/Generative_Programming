@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "/mnt/c/Users/Gergely/Documents/Private/Git/Generative_Programming/boost_1_77_0",
                 "D:/ProgramFiles/MinGW/include/c++/10.3.0/**",
                 "D:/ProgramFiles/MinGW/include/llvm/**",
                 "D:/ProgramFiles/MinGW/include/**"
@@ -13,13 +14,14 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "D:/ProgramFiles/MinGW/bin/clang++.exe",
+            "compilerPath": "/usr/bin/clang++-10",
             "cStandard": "gnu17",
             "cppStandard": "c++20",
             "intelliSenseMode": "windows-clang-x64",
             "compilerArgs": [
-                "-I \"D:\\Program Files\\boost_1_77_0\""
-            ]
+                "-I \"/mnt/c/Users/Gergely/Documents/Private/Git/Generative_Programming/boost_1_77_0\""
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4
