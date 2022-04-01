@@ -64,6 +64,15 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "*.ipp": "cpp",
+        "any": "cpp",
+        "charconv": "cpp",
+        "forward_list": "cpp",
+        "rope": "cpp",
+        "future": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
     }
 }

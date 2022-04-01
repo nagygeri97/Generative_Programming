@@ -41,3 +41,5 @@ CMakeCache.txt
 # Boost
 boost*/
 
+# Executables
+*.out
