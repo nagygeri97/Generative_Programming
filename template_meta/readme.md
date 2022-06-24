@@ -23,8 +23,8 @@ This repo contains some template metaprogramming exercises in C++, from the some
 * Optional: regenerate `Makefile` by running `cmake .` in the `template_meta` directory.
 * Now the `Makefile` should be up to date.
 
-## Compiling the subproject
-* To compile all subprojects run `make all` (or simply `make`).
+## Compiling the projects
+* To compile all projects run `make all` (or simply `make`).
 The resulting executables will have the name `{project}.out`
 * Since the projects are using template metaprogramming all programming errors should be displayed during compile time. Running the executables does not have any effect.
 * To build individual projects, use `make {project}`, where the possible projects are:
