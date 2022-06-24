@@ -1,8 +1,10 @@
 project( template_meta )
 cmake_minimum_required( VERSION 2.6 )
 
-set(BOOST_ROOT /mnt/c/Users/Gergely/Documents/Private/Git/Generative_Programming/boost_1_77_0/)
-find_package( Boost REQUIRED )
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(BOOST_REQUESTED_VERSION 1.77.0)
+# set(BOOST_ROOT /mnt/c/Users/Gergely/Documents/Private/Git/Generative_Programming/boost_1_77_0/)
+find_package(Boost COMPONENTS system program_options)
 include_directories( ${Boost_INCLUDE_DIR} )
 link_directories( ${Boost_LIBRARY_DIRS} )
 set( Boost_USE_STATIC_LIBS        OFF )
