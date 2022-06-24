@@ -46,3 +46,13 @@ Boost-prefix/
 
 # Executables
 *.out
+
+# LaTeX
+*.toc
+*.aux
+*.log
+*.nav
+*.snm
+*.fls
+*.fdb_latexmk
+*.gz
