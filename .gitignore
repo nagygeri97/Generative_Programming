@@ -35,11 +35,14 @@
 CMakeFiles/
 build/
 Makefile
-*.cmake
+cmake_install.cmake
+.cmake/
 CMakeCache.txt
+compile_commands.json
 
 # Boost
 boost*/
+Boost-prefix/
 
 # Executables
 *.out
